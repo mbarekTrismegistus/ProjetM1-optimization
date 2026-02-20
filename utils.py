@@ -1,4 +1,6 @@
 import random
+import matplotlib.pyplot as plt
+import os
 
 # ==========================================
 # 1. INITIALIZATION & EVALUATION
@@ -103,3 +105,35 @@ def generate_all_2opt_neighbors(tour):
         for j in range(i + 1, n):
             neighbors.append(generate_2opt_neighbor(tour, i, j))
     return neighbors
+
+def plot_tsp_route(tour, coordinates, title, save_path):
+    """
+    Génère un graphique du trajet TSP et le sauvegarde en image.
+    """
+    plt.figure(figsize=(10, 7))
+    
+    # Extraire les coordonnées dans l'ordre du tour
+    ordered_coords = [coordinates[i] for i in tour]
+    # Ajouter le retour à la ville de départ
+    ordered_coords.append(coordinates[tour[0]])
+    
+    x, y = zip(*ordered_coords)
+    
+    # Tracer les chemins
+    plt.plot(x, y, color='red', linewidth=1, alpha=0.7, zorder=1)
+    
+    # Tracer toutes les villes (bleu)
+    all_x, all_y = zip(*coordinates)
+    plt.scatter(all_x, all_y, color='blue', s=30, zorder=2)
+    
+    # Tracer la ville de départ (GROS CERCLE VERT)
+    start_city = coordinates[tour[0]]
+    plt.scatter(start_city[0], start_city[1], color='lime', s=150, 
+                edgecolors='black', label='Start City', zorder=3)
+    
+    plt.title(title)
+    plt.legend()
+    
+    # Sauvegarde automatique
+    plt.savefig(save_path)
+    plt.close() # Fermer pour libérer la mémoire

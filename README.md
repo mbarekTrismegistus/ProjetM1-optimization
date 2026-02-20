@@ -1,51 +1,81 @@
-# Projet d'Optimisation : Problème du Voyageur de Commerce (TSP)
+# 🚀 Projet d'Optimisation : Problème du Voyageur de Commerce (TSP)
 
-Ce projet implémente et compare plusieurs algorithmes de métaheuristiques pour résoudre le Problème du Voyageur de Commerce (TSP - Traveling Salesperson Problem). 
+Ce projet implémente et compare plusieurs métaheuristiques pour résoudre le Problème du Voyageur de Commerce (TSP). L'objectif est de trouver le cycle le plus court passant par un ensemble de villes, en revenant au point de départ.
 
-Les algorithmes développés visent à minimiser la distance totale d'un parcours reliant un ensemble de villes, en revenant au point de départ.
+## 📊 Protocole Expérimental
+Pour garantir la rigueur scientifique (Section 4 de l'énoncé), chaque algorithme a été testé sur **30 runs indépendants**. Les statistiques ci-dessous résument la performance et la stabilité de chaque approche.
 
-## Architecture du Projet
+---
 
-Le code a été découpé de manière modulaire pour séparer la logique des algorithmes, la manipulation des données et le protocole de test :
+## 📍 Instance : Ulysses20 (20 villes)
+Instance de petite taille basée sur l'Odyssée d'Ulysse.
 
-* `experiment.py` : Le point d'entrée du programme. Il exécute le protocole expérimental complet (30 runs indépendants) et affiche les statistiques (Meilleur coût, moyenne, écart-type, temps CPU).
-* `algorithms.py` : Contient les classes orientées objet des algorithmes de résolution (`HillClimbing`, `MultiStartHillClimbing`, `SimulatedAnnealing`).
-* `utils.py` : La boîte à outils contenant les fonctions d'évaluation (calcul de distance) et de génération de voisinages (Swap).
-* `data_loader.py` : Le script chargé de lire et parser les fichiers de coordonnées au format standard TSPLIB.
-* `data/` : Le dossier contenant les instances de test (ex: `berlin52.tsp`).
+### Statistiques
+| Algorithme | Meilleur Coût | Coût Moyen | Écart-Type |
+| :--- | :---: | :---: | :---: |
+| **HC First Improvement** | 72 | 85.57 | 8.56 |
+| **HC Best Improvement** | 72 | 79.83 | 6.36 |
+| **Recuit Simulé** | 75 | 86.67 | 7.27 |
 
-## Prérequis
+### Visualisation des Résultats
+| HC First | HC Best | Recuit Simulé |
+| :---: | :---: | :---: |
+| ![HC First](Instance_20_Cities/HC_First.png) | ![HC Best](Instance_20_Cities/HC_Best.png) | ![Recuit](Instance_20_Cities/Recuit_Simule.png) |
 
-* **Python 3.x** installé sur votre machine.
-* Aucune bibliothèque externe n'est requise pour l'exécution principale (seuls les modules natifs `math`, `random`, `time`, `os` et `statistics` sont utilisés).
+**Graphique Comparatif :**
+![Comparaison 20](Instance_20_Cities/comparaison_algos.png)
 
-## Comment exécuter le projet
+---
 
-1.  Ouvrez un terminal ou une invite de commande.
-2.  Naviguez jusqu'au dossier racine de ce projet.
-3.  Assurez-vous que le dossier `data/` contient bien l'instance que vous souhaitez tester (par défaut `berlin52.tsp`).
-4.  Lancez la commande suivante :
+## 📍 Instance : Berlin40 (40 villes)
+Instance de taille intermédiaire (tronquée de Berlin52).
 
-    ```bash
-    python experiment.py
-    ```
+### Statistiques
+| Algorithme | Meilleur Coût | Coût Moyen | Écart-Type |
+| :--- | :---: | :---: | :---: |
+| **HC First Improvement** | 7368 | 8380.37 | 629.61 |
+| **HC Best Improvement** | 7669 | 8571.10 | 485.94 |
+| **Recuit Simulé** | 9520 | 10303.37 | 483.94 |
 
-## Protocole Expérimental
+### Visualisation des Résultats
+| HC First | HC Best | Recuit Simulé |
+| :---: | :---: | :---: |
+| ![HC First](Instance_40_Cities/HC_First.png) | ![HC Best](Instance_40_Cities/HC_Best.png) | ![Recuit](Instance_40_Cities/Recuit_Simule.png) |
 
-Le script `experiment.py` va automatiquement tester les algorithmes suivants sur l'instance configurée :
-1.  **Hill-Climbing (First Improvement)**
-2.  **Hill-Climbing (Best Improvement)**
-3.  **Multi-Start Hill-Climbing** (Budget : 10 départs par run)
-4.  **Recuit Simulé (Simulated Annealing)** (Température initiale : 5000, alpha : 0.9995)
+**Graphique Comparatif :**
+![Comparaison 40](Instance_40_Cities/comparaison_algos.png)
 
-Pour garantir la fiabilité scientifique des résultats, chaque algorithme est lancé **30 fois de manière indépendante**. Le programme affichera ensuite dans la console le meilleur coût absolu, le coût moyen, l'écart-type et le temps de calcul moyen pour chaque approche.
+---
 
-## Changer d'instance de test
+## 📍 Instance : Eil80 (80 villes)
+Instance à grande échelle pour tester la robustesse des algorithmes.
 
-Si vous souhaitez tester une autre carte de villes (par exemple `ulysses22.tsp`), il vous suffit de :
-1.  Placer le fichier `.tsp` dans le dossier `data/`.
-2.  Ouvrir le fichier `experiment.py`.
-3.  Modifier la variable `filename` au début de la fonction `main()` :
-    ```python
-    filename = "data/ulysses22.tsp"
-    ```
+### Statistiques
+| Algorithme | Meilleur Coût | Coût Moyen | Écart-Type |
+| :--- | :---: | :---: | :---: |
+| **HC First Improvement** | 11508 | 12846.63 | 752.43 |
+| **HC Best Improvement** | 11618 | 13267.53 | 887.72 |
+| **Recuit Simulé** | 19584 | 21796.83 | 936.30 |
+
+### Visualisation des Résultats
+| HC First | HC Best | Recuit Simulé |
+| :---: | :---: | :---: |
+| ![HC First](Instance_80_Cities/HC_First.png) | ![HC Best](Instance_80_Cities/HC_Best.png) | ![Recuit](Instance_80_Cities/Recuit_Simule.png) |
+
+**Graphique Comparatif :**
+![Comparaison 80](Instance_80_Cities/comparaison_algos.png)
+
+---
+
+## 🛠️ Structure du Projet
+- **`experiment.py`** : Lance le protocole de test sur les 3 instances et génère les dossiers d'images.
+- **`algorithms.py`** : Contient les classes `HillClimbing` et `SimulatedAnnealing`.
+- **`utils.py`** : Fonctions de calcul de distance, gestion des tours et génération des graphiques.
+- **`data_loader.py`** : Charge les fichiers `.tsp`.
+- **`data/`** : Contient les fichiers sources des villes.
+
+## 🚀 Comment l'utiliser ?
+1. Installer les dépendances : `pip install matplotlib numpy`
+2. Exécuter le script principal :
+   ```bash
+   python experiment.py
