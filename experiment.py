@@ -1,14 +1,15 @@
 import os
 import time
 import statistics
+import random
 import matplotlib.pyplot as plt
-from utils import create_initial_tour, plot_tsp_route
-from algorithms import HillClimbing, SimulatedAnnealing,TabuSearch
+from utils import plot_tsp_route, create_strictly_fixed_initial_tour
+from algorithms import HillClimbing, SimulatedAnnealing, TabuSearch
 from data_loader import load_tsplib_data, calculate_distance_matrix_from_coords
 
 def generer_graphique_comparatif(resultats, folder_path, instance_name):
     """
-    Crée un graphique à barres comparant les performances des algorithmes.
+    Design Esign : Graphique avec barres d'erreur pour l'écart-type.
     """
     noms = [r['nom'] for r in resultats]
     meilleurs = [r['meilleur'] for r in resultats]
@@ -20,17 +21,16 @@ def generer_graphique_comparatif(resultats, folder_path, instance_name):
 
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Barre pour le meilleur résultat et la moyenne
+    # Barres pour le meilleur résultat et la moyenne avec barres d'erreur
     rects1 = ax.bar([p - width/2 for p in x], meilleurs, width, label='Meilleur Coût', color='#2ecc71')
     rects2 = ax.bar([p + width/2 for p in x], moyennes, width, label='Coût Moyen', color='#3498db', yerr=ecarts, capsize=5)
 
     ax.set_ylabel('Distance (Coût)')
-    ax.set_title(f'Comparaison Statistiques - {instance_name}')
+    ax.set_title(f'Statistiques - {instance_name} (Départ Fixe)')
     ax.set_xticks(x)
     ax.set_xticklabels(noms)
     ax.legend()
 
-    # Ajouter les valeurs au-dessus des barres
     ax.bar_label(rects1, padding=3)
     ax.bar_label(rects2, padding=3)
 
@@ -38,17 +38,17 @@ def generer_graphique_comparatif(resultats, folder_path, instance_name):
     plt.savefig(os.path.join(folder_path, "comparaison_algos.png"))
     plt.close()
 
-def evaluer_algorithme(nom_algo, classe_algo, distance_matrix, coordinates, kwargs_algo, folder_path, num_runs=30):
+def evaluer_algorithme(nom_algo, classe_algo, distance_matrix, coordinates, fixed_tours, kwargs_algo, folder_path):
     couts = []
     temps_exec = []
     meilleur_tour = None
     meilleur_cout = float('inf')
-    num_villes = len(coordinates)
     
     print(f"  > Exécution de {nom_algo}...", end=" ", flush=True)
     
-    for i in range(num_runs):
-        tour_initial = create_initial_tour(num_villes)
+    for i in range(len(fixed_tours)):
+        # Utilisation du tour pré-généré (Ville 0 fixée)
+        tour_initial = list(fixed_tours[i])
         algo = classe_algo(distance_matrix, tour_initial, **kwargs_algo)
         
         debut = time.time()
@@ -64,24 +64,18 @@ def evaluer_algorithme(nom_algo, classe_algo, distance_matrix, coordinates, kwar
     
     print("Terminé.")
 
-    moyenne_cout = statistics.mean(couts)
-    ecart_type_cout = statistics.stdev(couts) if num_runs > 1 else 0
-    temps_moyen = statistics.mean(temps_exec)
-    
-    # Image du trajet
-    file_safe_name = nom_algo.replace(" ", "_")
-    image_path = os.path.join(folder_path, f"{file_safe_name}.png")
-    titre_graphique = f"{nom_algo} - {num_villes} Villes\nMeilleur Coût: {meilleur_cout}"
-    plot_tsp_route(meilleur_tour, coordinates, titre_graphique, image_path)
-    
-    # Retourner les stats pour le graphique comparatif
-    return {
+    stats = {
         "nom": nom_algo,
         "meilleur": meilleur_cout,
-        "moyenne": round(moyenne_cout, 2),
-        "std": round(ecart_type_cout, 2),
-        "t_moy": round(temps_moyen, 4)
+        "moyenne": round(statistics.mean(couts), 2),
+        "std": round(statistics.stdev(couts), 2),
+        "t_moy": round(statistics.mean(temps_exec), 4)
     }
+    
+    image_path = os.path.join(folder_path, f"{nom_algo.replace(' ', '_')}.png")
+    plot_tsp_route(meilleur_tour, coordinates, f"{nom_algo} - Best: {meilleur_cout}", image_path)
+    
+    return stats
 
 def main():
     instances = [
@@ -91,14 +85,11 @@ def main():
     ]
     
     NB_RUNS = 30 
-    
-    print("🚀 DÉMARRAGE DU PROTOCOLE EXPÉRIMENTAL TSP")
+    print("\n🚀 DÉMARRAGE DU PROTOCOLE : DÉPART FIXE & STATS")
 
     for inst in instances:
         file_path = os.path.join("data", inst["file"])
-        if not os.path.exists(file_path):
-            print(f"❌ Fichier {file_path} introuvable.")
-            continue
+        if not os.path.exists(file_path): continue
 
         output_folder = inst["name"]
         os.makedirs(output_folder, exist_ok=True)
@@ -106,26 +97,37 @@ def main():
         coords = load_tsplib_data(file_path)
         dist_matrix = calculate_distance_matrix_from_coords(coords)
         
-        print(f"\n--- ANALYSE : {inst['file']} ({len(coords)} villes) ---")
+        # --- Tours de départ identiques pour tous les algos (Ville 0 fixe) ---
+        tours_fixes = [create_strictly_fixed_initial_tour(len(coords)) for _ in range(NB_RUNS)]
+        
+        print(f"\n--- ANALYSE : {inst['name']} ({len(coords)} villes) ---")
+        # Design du terminal aligné
+        print(f"{'Algorithme':<18} | {'Meilleur':<10} | {'Moyenne':<10} | {'Ecart-Type':<10} | {'Temps (s)':<10}")
+        print("-" * 75)
         
         configurations = [
             ("HC First", HillClimbing, {"mode": "first"}),
             ("HC Best", HillClimbing, {"mode": "best"}),
             ("Recuit Simule", SimulatedAnnealing, {"T0": 1000, "alpha": 0.99, "T_min": 0.1}),
-    ("Tabu Search", TabuSearch, {"tabu_size": 20, "max_iter": 100})
+            ("Tabu Search", TabuSearch, {"tabu_size": 20, "max_iter": 100})
         ]
         
         resultats_instance = []
-        
         for nom, classe, params in configurations:
-            stats = evaluer_algorithme(nom, classe, dist_matrix, coords, params, output_folder, NB_RUNS)
+            stats = evaluer_algorithme(nom, classe, dist_matrix, coords, tours_fixes, params, output_folder)
             resultats_instance.append(stats)
-            
-            print(f"      🔹 Meilleur: {stats['meilleur']} | Moyenne: {stats['moyenne']} | Ecart-Type: {stats['std']}")
+            print(f"{nom:<18} | {stats['meilleur']:<10.0f} | {stats['moyenne']:<10.2f} | {stats['std']:<10.2f} | {stats['t_moy']:<10.4f}")
 
-        # GÉNÉRATION DU GRAPHIQUE COMPARATIF PAR INSTANCE
+        # --- Élection du Meilleur Algo sur les Statistiques ---
+        # On choisit celui qui a la moyenne la plus basse
+        best_algo = min(resultats_instance, key=lambda x: x['moyenne'])
+        
+        print("-" * 75)
+        print(f"🏆 MEILLEUR ALGO POUR {inst['name']} : {best_algo['nom']}")
+        print(f"   Score moyen: {best_algo['moyenne']} (Stabilité ±{best_algo['std']})")
+        print("-" * 75)
+
         generer_graphique_comparatif(resultats_instance, output_folder, inst["name"])
-        print(f"      📊 Graphique comparatif généré dans {output_folder}/")
 
     print("\n" + "="*50)
     print("✅ TOUTES LES EXPÉRIENCES SONT TERMINÉES.")

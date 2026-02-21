@@ -1,139 +1,109 @@
+# utils.py
 import random
 import matplotlib.pyplot as plt
 import os
 
 # ==========================================
-# 1. INITIALIZATION & EVALUATION
+# 1. INITIALISATION & ÉVALUATION
 # ==========================================
 
 def create_initial_tour(num_cities):
     """
-    Creates a random initial route (a permutation of cities).
-    Example for 5 cities: [2, 0, 4, 1, 3]
+    Crée un tour aléatoire simple (ancienne méthode).
     """
     tour = list(range(num_cities))
     random.shuffle(tour)
     return tour
 
+def create_strictly_fixed_initial_tour(num_cities):
+    """
+    Génère un tour commençant TOUJOURS par la ville d'index 0.
+    Le reste des villes (1 à n-1) est mélangé aléatoirement.
+    """
+    villes_restantes = list(range(1, num_cities))
+    random.shuffle(villes_restantes)
+    # On force la ville 0 en première position
+    return [0] + villes_restantes
+
 def calculate_route_distance(route, distance_matrix):
     """
-    Calculates the total distance of a given route using the distance matrix.
-    Includes the return trip from the last city back to the first.
+    Calcule la distance totale d'une route.
+    Inclut le retour de la dernière ville vers la première.
     """
     total_distance = 0
     num_cities = len(route)
     
     for i in range(num_cities):
         current_city = route[i]
-        next_city = route[(i + 1) % num_cities] # Wraps around to 0 at the end
+        next_city = route[(i + 1) % num_cities] 
         total_distance += distance_matrix[current_city][next_city]
         
     return total_distance
 
-
 # ==========================================
-# 2. SWAP NEIGHBORHOOD (For basic algorithms)
+# 2. VOISINAGE (SWAP)
 # ==========================================
-# 
 
 def generate_random_swap_neighbor(tour):
     """
-    Picks two random positions and swaps the cities at those positions.
-    (Used mainly for Simulated Annealing)
+    Choisit deux positions (hors index 0) et échange les villes.
+    Utilisé pour le Recuit Simulé.
     """
     new_tour = tour.copy() 
     n = len(tour)
-    
-    # Choose two different random indices
-    i, j = random.sample(range(n), 2)
-    
-    # Swap the cities
+    # On choisit deux indices entre 1 et n-1 pour ne pas toucher au départ
+    i, j = random.sample(range(1, n), 2)
     new_tour[i], new_tour[j] = new_tour[j], new_tour[i]
-    
     return new_tour
 
 def generate_all_swap_neighbors(tour):
     """
-    Generates a list of ALL possible neighbors by swapping 2 by 2.
-    (Used mainly for Hill-Climbing Best/First Improvement)
+    Génère TOUS les voisins possibles par échange (hors index 0).
+    Utilisé pour le Hill-Climbing.
     """
     neighbors = []
     n = len(tour)
-    
-    for i in range(n):
+    for i in range(1, n):
         for j in range(i + 1, n):
             neighbor = tour.copy()
             neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
             neighbors.append(neighbor)
-            
     return neighbors
 
-
 # ==========================================
-# 3. 2-OPT NEIGHBORHOOD (Optional but highly recommended)
+# 3. VISUALISATION
 # ==========================================
-# 
-
-def generate_2opt_neighbor(tour, i, j):
-    """
-    Reverses the order of the cities in the segment from index i to index j.
-    Assumes i < j.
-    """
-    # Keep the start, reverse the middle part, keep the end
-    new_tour = tour[:i] + tour[i:j+1][::-1] + tour[j+1:]
-    return new_tour
-
-def generate_random_2opt_neighbor(tour):
-    """
-    Generates a single random 2-opt neighbor.
-    (Can be used as an upgrade for Simulated Annealing)
-    """
-    n = len(tour)
-    # Pick two random indices and make sure i < j using sorted()
-    i, j = sorted(random.sample(range(n), 2))
-    
-    return generate_2opt_neighbor(tour, i, j)
-
-def generate_all_2opt_neighbors(tour):
-    """
-    Generates a list of ALL possible 2-opt neighbors.
-    (Can be used as an upgrade for Hill-Climbing)
-    """
-    neighbors = []
-    n = len(tour)
-    for i in range(n - 1):
-        for j in range(i + 1, n):
-            neighbors.append(generate_2opt_neighbor(tour, i, j))
-    return neighbors
 
 def plot_tsp_route(tour, coordinates, title, save_path):
     """
-    Génère un graphique du trajet TSP et le sauvegarde en image.
+    Génère un graphique du trajet TSP et le sauvegarde.
+    Affiche la ville de départ en évidence.
     """
     plt.figure(figsize=(10, 7))
     
     # Extraire les coordonnées dans l'ordre du tour
     ordered_coords = [coordinates[i] for i in tour]
-    # Ajouter le retour à la ville de départ
+    # Retour à la ville de départ
     ordered_coords.append(coordinates[tour[0]])
     
     x, y = zip(*ordered_coords)
     
-    # Tracer les chemins
-    plt.plot(x, y, color='red', linewidth=1, alpha=0.7, zorder=1)
+    # Tracer les chemins (Lignes)
+    plt.plot(x, y, color='#e74c3c', linewidth=1, alpha=0.7, zorder=1)
     
-    # Tracer toutes les villes (bleu)
+    # Tracer toutes les villes (Points bleus)
     all_x, all_y = zip(*coordinates)
-    plt.scatter(all_x, all_y, color='blue', s=30, zorder=2)
+    plt.scatter(all_x, all_y, color='#3498db', s=30, zorder=2)
     
-    # Tracer la ville de départ (GROS CERCLE VERT)
+    # Tracer la ville de départ (GROS POINT VERT)
+    # On prend la première ville du tour (qui doit être l'index 0)
     start_city = coordinates[tour[0]]
-    plt.scatter(start_city[0], start_city[1], color='lime', s=150, 
-                edgecolors='black', label='Start City', zorder=3)
+    plt.scatter(start_city[0], start_city[1], color='#2ecc71', s=150, 
+                edgecolors='black', label='Départ (Fixé)', zorder=3)
     
     plt.title(title)
     plt.legend()
+    plt.grid(True, linestyle=':', alpha=0.5)
     
-    # Sauvegarde automatique
-    plt.savefig(save_path)
-    plt.close() # Fermer pour libérer la mémoire
+    plt.savefig(save_path, dpi=300)
+    plt.close()

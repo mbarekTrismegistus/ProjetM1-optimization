@@ -1,6 +1,4 @@
-#  
-#    🌍 OPTIMISATION DU VOYAGEUR DE COMMERCE (TSP) - METAHEURISTIQUES 
-#  
+# 🌍 OPTIMISATION DU VOYAGEUR DE COMMERCE (TSP) - METAHEURISTIQUES 
 
 ## 🎓 Cadre Académique
 * **Établissement :** Université Hassan II de Casablanca – ENSET Mohammedia
@@ -31,8 +29,6 @@ $$
 d(u, v) = \sqrt{(x_u - x_v)^2 + (y_u - y_v)^2}
 $$
 
-
-
 ### Algorithmes Implémentés
 Nous avons exploré et comparé quatre approches algorithmiques pour naviguer dans cet espace de recherche discret :
 1.  **Hill Climbing (First Improvement)** : Une recherche locale gloutonne qui accepte le premier voisin améliorant trouvé.
@@ -43,20 +39,20 @@ Nous avons exploré et comparé quatre approches algorithmiques pour naviguer da
 ---
 
 ## 📊 Protocole Expérimental
-Conformément à la démarche scientifique, chaque algorithme est évalué sur **30 runs indépendants**. Les statistiques extraites permettent d'analyser la convergence, la qualité de la solution (Meilleur coût) et la robustesse (Écart-type).
+Conformément à la démarche scientifique, chaque algorithme est évalué sur **30 runs indépendants**. Les statistiques extraites permettent d'analyser la convergence, la qualité de la solution (Meilleur coût) et la robustesse (Écart-type). **Le point de départ est fixé à la ville 0 pour tous les tests.**
 
 ---
 
-## 📍 Instance 1 : Ulysses20 (20 villes)
+## 📍 Instance 1 : Instance_20_Cities (20 villes)
 Instance de petite taille basée sur l'Odyssée d'Ulysse.
 
 ### Statistiques
-| Algorithme | Meilleur Coût | Coût Moyen | Écart-Type |
-| :--- | :---: | :---: | :---: |
-| **HC First Improvement** | 74 | 86.17 | 7.13 |
-| **HC Best Improvement** | 72 | 82.30 | 7.28 |
-| **Recuit Simulé** | 74 | 86.13 | 7.93 |
-| **Tabu Search** | **72** | **74.07** | **3.91** |
+| Algorithme | Meilleur Coût | Coût Moyen | Ecart-Type | Temps (s) |
+| :--- | :---: | :---: | :---: | :---: |
+| **HC First Improvement** | 5366 | 6402.17 | 554.84 | 0.0038 |
+| **HC Best Improvement** | 5535 | 6199.87 | 407.33 | 0.0048 |
+| **Recuit Simulé** | 5634 | 6313.27 | 353.95 | 0.0038 |
+| **Tabu Search** | **5278** | **5717.43** | **226.73** | **0.0407** |
 
 ### Visualisation des Meilleurs Trajets
 | HC First Improvement | HC Best Improvement |
@@ -66,20 +62,27 @@ Instance de petite taille basée sur l'Odyssée d'Ulysse.
 | ![Recuit](Instance_20_Cities/Recuit_Simule.png) | ![Tabu](Instance_20_Cities/Tabu_Search.png) |
 
 **Analyse des Performances :**
-![Comparaison 20](Instance_20_Cities/comparaison_algos.png)
+![Comparaison 20](Instance_20_Cities/comparaison_algos.png) 
+---
+
+| 🏆 **Meilleur algorithme :** Tabu Search — Score moyen : **5645.23** (Stabilité ±233.19)|
+| :---: |
+| ![Tabu](Instance_20_Cities/Tabu_Search.png)|
+
+
 
 ---
 
-## 📍 Instance 2 : Berlin40 (40 villes)
-Instance intermédiaire tronquée de Berlin52.
+## 📍 Instance 2 : Instance_40_Cities (40 villes)
+Instance intermédiaire basée sur Berlin.
 
 ### Statistiques
-| Algorithme | Meilleur Coût | Coût Moyen | Écart-Type |
-| :--- | :---: | :---: | :---: |
-| **HC First Improvement** | 7403 | 8465.30 | 534.34 |
-| **HC Best Improvement** | 7833 | 8782.53 | 551.88 |
-| **Recuit Simulé** | 9183 | 10425.37 | 719.94 |
-| **Tabu Search** | **7317** | **8179.03** | **487.45** |
+| Algorithme | Meilleur Coût | Coût Moyen | Ecart-Type | Temps (s) |
+| :--- | :---: | :---: | :---: | :---: |
+| **HC First Improvement** | 7572 | 8815.80 | 720.61 | 0.0787 |
+| **HC Best Improvement** | 7563 | 8778.17 | 701.58 | 0.0822 |
+| **Recuit Simulé** | 9214 | 10293.47 | 559.05 | 0.0054 |
+| **Tabu Search** | **7256** | **8223.40** | **535.04** | **0.2798** |
 
 ### Visualisation des Meilleurs Trajets
 | HC First Improvement | HC Best Improvement |
@@ -89,22 +92,26 @@ Instance intermédiaire tronquée de Berlin52.
 | ![Recuit](Instance_40_Cities/Recuit_Simule.png) | ![Tabu](Instance_40_Cities/Tabu_Search.png) |
 
 **Analyse des Performances :**
-![Comparaison 40](Instance_40_Cities/comparaison_algos.png)
+![Comparaison 40](Instance_40_Cities/comparaison_algos.png) 
+---
+
+| 🏆 **Meilleur algorithme :** Tabu Search — Score moyen : **8190.43** (Stabilité ±478.71) |
+| :---: |
+| ![Tabu](Instance_40_Cities/Tabu_Search.png)|
+
 
 ---
 
-## 📍 Instance 3 : Eil80 (80 villes)
-Instance à large échelle testant les limites de convergence des métaheuristiques.
+## 📍 Instance 3 : Instance_80_Cities (80 villes)
+Instance à large échelle testant les limites de convergence.
 
 ### Statistiques
-| Algorithme | Meilleur Coût | Coût Moyen | Écart-Type |
-| :--- | :---: | :---: | :---: |
-| **HC First Improvement** | **11062** | 12862.43 | 977.71 |
-| **HC Best Improvement** | 12114 | 13774.70 | 706.93 |
-| **Recuit Simulé** | 19327 | 21673.93 | 1319.29 |
-| **Tabu Search** | 11556 | 13161.23 | 802.24 |
-
-
+| Algorithme | Meilleur Coût | Coût Moyen | Ecart-Type | Temps (s) |
+| :--- | :---: | :---: | :---: | :---: |
+| **HC First Improvement** | **11374** | **13299.27** | 990.91 | 1.3441 |
+| **HC Best Improvement** | 11796 | 13615.60 | 1067.18 | 1.6899 |
+| **Recuit Simulé** | 19723 | 21358.43 | 875.38 | 0.0085 |
+| **Tabu Search** | 11594 | 13454.97 | 1081.16 | 2.1154 |
 
 ### Visualisation des Meilleurs Trajets
 | HC First Improvement | HC Best Improvement |
@@ -113,19 +120,41 @@ Instance à large échelle testant les limites de convergence des métaheuristiq
 | **Recuit Simulé** | **Tabu Search** |
 | ![Recuit](Instance_80_Cities/Recuit_Simule.png) | ![Tabu](Instance_80_Cities/Tabu_Search.png) |
 
-**Analyse des Performances :**> 
+**Analyse des Performances :**
 ![Graphique Comparatif](Instance_80_Cities/comparaison_algos.png) 
+---
+
+| 🏆 **Meilleur algorithme :** HC First — Score moyen : **12847.03** (Stabilité ±765.19) |
+| :---: |
+| ![HC First](Instance_80_Cities/HC_First.png)|
+---
+
+## 🗺️ Analyse de la Meilleure Solution (Best Traject)
+L'analyse visuelle des solutions montre une élimination des croisements de segments. La fixation du point de départ à la **Ville 0** (point de départ des tracés) est respectée sur toutes les instances. La Recherche Tabou s'avère la plus stable sur 20 et 40 villes, tandis que le Hill Climbing (First) est plus performant sur 80 villes.
+
+
 
 ---
 
 ## 🛠️ Structure du Projet
-- **`algorithms.py`** : Logique des classes `HillClimbing`, `SimulatedAnnealing`, et `TabuSearch`.
-- **`experiment.py`** : Orchestrateur lançant les tests et la génération d'images.
-- **`utils.py`** : Fonctions utilitaires (Calculs, Voisinages, Matplotlib).
-- **`data_loader.py`** : Module de lecture des fichiers `.tsp`.
+```
+ProjetM1-optimization/
+│
+├── data/              # Dossier contenant les fichiers de données TSPLIB (`.tsp`).
+├── algorithms.py      # Logique : HillClimbing, SimulatedAnnealing, TabuSearch
+├── experiment.py      # Orchestrateur : lance les tests et génère les images
+├── utils.py           # Fonctions utilitaires (calculs, voisinages, Matplotlib)
+└── data_loader.py     # Module de lecture des fichiers .tsp
+```
 
 ## 🚀 Utilisation
-1. Installer les dépendances : `pip install matplotlib`
-2. Lancer le protocole d'expérimentation :
-   ```bash
-   python experiment.py
+
+**1. Installer les dépendances :**
+```bash
+pip install matplotlib
+```
+
+**2. Lancer le protocole :**
+```bash
+python experiment.py
+```
