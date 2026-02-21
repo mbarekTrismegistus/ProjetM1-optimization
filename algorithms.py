@@ -165,3 +165,52 @@ class SimulatedAnnealing:
             self.T *= self.alpha
             
         return self.best_tour, self.best_cost
+    
+class TabuSearch:
+    def __init__(self, distance_matrix, initial_tour, tabu_size=15, max_iter=200):
+        self.distance_matrix = distance_matrix
+        self.current_tour = initial_tour
+        self.current_cost = calculate_route_distance(initial_tour, distance_matrix)
+        self.tabu_size = tabu_size
+        self.max_iter = max_iter
+        
+        self.best_tour = self.current_tour
+        self.best_cost = self.current_cost
+
+    def run(self):
+        from collections import deque
+        tabu_list = deque(maxlen=self.tabu_size)
+        n = len(self.current_tour)
+
+        for _ in range(self.max_iter):
+            best_candidate = None
+            best_candidate_cost = float('inf')
+            best_move = None
+
+            # On explore le voisinage par Swap
+            for i in range(n):
+                for j in range(i + 1, n):
+                    move = tuple(sorted((i, j)))
+                    
+                    # Générer voisin
+                    neighbor = self.current_tour.copy()
+                    neighbor[i], neighbor[j] = neighbor[j], neighbor[i]
+                    cost = calculate_route_distance(neighbor, self.distance_matrix)
+
+                    # Critère : non tabou OU amélioration globale (aspiration)
+                    if move not in tabu_list or cost < self.best_cost:
+                        if cost < best_candidate_cost:
+                            best_candidate_cost = cost
+                            best_candidate = neighbor
+                            best_move = move
+
+            if best_candidate:
+                self.current_tour = best_candidate
+                self.current_cost = best_candidate_cost
+                tabu_list.append(best_move)
+                
+                if best_candidate_cost < self.best_cost:
+                    self.best_cost = best_candidate_cost
+                    self.best_tour = best_candidate
+
+        return self.best_tour, self.best_cost

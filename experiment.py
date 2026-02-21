@@ -3,7 +3,7 @@ import time
 import statistics
 import matplotlib.pyplot as plt
 from utils import create_initial_tour, plot_tsp_route
-from algorithms import HillClimbing, SimulatedAnnealing
+from algorithms import HillClimbing, SimulatedAnnealing,TabuSearch
 from data_loader import load_tsplib_data, calculate_distance_matrix_from_coords
 
 def generer_graphique_comparatif(resultats, folder_path, instance_name):
@@ -111,7 +111,8 @@ def main():
         configurations = [
             ("HC First", HillClimbing, {"mode": "first"}),
             ("HC Best", HillClimbing, {"mode": "best"}),
-            ("Recuit Simule", SimulatedAnnealing, {"T0": 1000, "alpha": 0.99, "T_min": 0.1})
+            ("Recuit Simule", SimulatedAnnealing, {"T0": 1000, "alpha": 0.99, "T_min": 0.1}),
+    ("Tabu Search", TabuSearch, {"tabu_size": 20, "max_iter": 100})
         ]
         
         resultats_instance = []
